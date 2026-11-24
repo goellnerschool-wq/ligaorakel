@@ -35,6 +35,11 @@ function form(team, vor = Infinity) {
 }
 const platzVon = id => tabelle.findIndex(t => t.teamInfoId === id || t.teamId === id) + 1;
 
+/* Nächster Spieltag: frühestes offenes Spiel, das nicht schon lange überfällig ist (verlegte Spiele ohne neues Datum überspringen) */
+function naechstesSpiel() {
+  const offen = alle.filter(s => s.saison === SAISON && !s.fertig).sort((a, b) => a.zeit - b.zeit);
+  return offen.find(s => s.zeit > Date.now() - 2 * 864e5) || offen[0];
+}
 /* ================= Live ================= */
 const LIVE_DAUER = 2.3 * 36e5;   // Anstoß bis Abpfiff inkl. Pause und Nachspielzeit
 const istLive = s => !s.fertig && Date.now() >= s.zeit && Date.now() <= s.zeit + LIVE_DAUER;
@@ -228,6 +233,7 @@ let timer = 0;
 async function aktualisieren() {
   clearTimeout(timer);
   try {
+    const alterSpieltag = aktuellerSpieltag;
     const d = await holen(`/getmatchdata/bl1/${SAISON}/${aktuellerSpieltag}`);
     const vorher = alle.filter(s => s.fertig).length;
     d.forEach(m => roh.set(m.matchID, m));
@@ -235,12 +241,13 @@ async function aktualisieren() {
     if (alle.filter(s => s.fertig).length !== vorher) {   // ein Spiel ist zu Ende: alles neu rechnen
       modellCache.clear();
       tabelle = await holen(`/getbltable/bl1/${SAISON}`).catch(() => tabelle);
-      const naechster = alle.filter(s => s.saison === SAISON && !s.fertig).sort((a, b) => a.zeit - b.zeit)[0];
+      const naechster = naechstesSpiel();
       if (naechster && naechster.spieltag !== aktuellerSpieltag && !alle.some(istLive)) aktuellerSpieltag = naechster.spieltag;
       modell = anpassen(alle, teams, Date.now(), SAISON);
       tabelleZeigen(); staerkenZeigen(); bilanzZeigen(); ausfaelleZeigen();
     }
     const offen = $$(".spiel[open]").map(x => x.dataset.id);
+    if (gezeigt === alterSpieltag && aktuellerSpieltag !== alterSpieltag) gezeigt = aktuellerSpieltag;   // Ansicht wandert zum neuen Spieltag mit
     heldZeigen(aktuellerSpieltag); if (gezeigt === aktuellerSpieltag) spieltagZeigen(gezeigt, true);
     offen.forEach(id => $(`.spiel[data-id="${id}"]`)?.setAttribute("open", ""));
     $$(".top-spiel").forEach(e => e.classList.add("da"));
@@ -270,7 +277,7 @@ async function start() {
     teams = [...new Set(alle.filter(s => s.saison === SAISON).flatMap(s => [s.heim, s.gast]))];
     tabelle = tab.length ? tab : teams.map(id => ({ teamInfoId: id, shortName: T[id].kurz, matches: 0, points: 0, goals: 0, opponentGoals: 0 }));
     maxSpieltag = Math.max(...alle.filter(s => s.saison === SAISON).map(s => s.spieltag));
-    const naechster = alle.filter(s => s.saison === SAISON && !s.fertig).sort((a, b) => a.zeit - b.zeit)[0];
+    const naechster = naechstesSpiel();
     const st = aktuellerSpieltag = naechster ? naechster.spieltag : maxSpieltag;
     modell = anpassen(alle, teams, Date.now(), SAISON); modellCache.set(st, modell);
     heldZeigen(st); spieltagZeigen(st);
