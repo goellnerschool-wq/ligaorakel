@@ -1,0 +1,1 @@
+{ "name": "Ligaorakel – Bundesliga-Prognosen", "short_name": "Ligaorakel", "start_url": "./", "display": "standalone", "background_color": "#07100c", "theme_color": "#07100c", "icons": [{ "src": "assets/symbol.svg", "sizes": "any", "type": "image/svg+xml" }] }

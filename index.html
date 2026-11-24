@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ligaorakel – Bundesliga-Prognosen aus Statistik</title>
+<meta name="description" content="Wie geht der nächste Bundesliga-Spieltag aus? Ligaorakel berechnet Sieg-, Remis- und Niederlage-Wahrscheinlichkeiten, das wahrscheinlichste Ergebnis und simuliert die restliche Saison 5.000-mal – mit offengelegter Trefferquote.">
+<meta name="theme-color" content="#07100c">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="assets/symbol.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preload" href="assets/fonts/big-shoulders-800.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/inter-tight-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="leiste">
+  <div class="rahmen leiste-innen">
+    <a class="marke" href="./"><img src="assets/symbol.svg" alt="" width="30" height="30"><span>LIGA<b>ORAKEL</b></span></a>
+    <nav class="hauptnav" aria-label="Bereiche"><a href="#spieltag">Spieltag</a><a href="#tabelle">Saison-Prognose</a><a href="#staerken">Teamstärken</a><a href="#bilanz">Trefferquote</a><a href="#methode">Methode</a></nav>
+  </div>
+</header>
+
+<main>
+  <section class="held">
+    <div class="flutlicht" aria-hidden="true"><span></span><span></span></div>
+    <div class="rahmen">
+      <p class="eyebrow" id="held-saison">1. Bundesliga · Statistik-Prognose</p>
+      <h1 id="held-titel">Wer gewinnt <span>am Wochenende?</span></h1>
+      <p class="held-text" id="held-text">Wahrscheinlichkeiten für jedes Spiel – berechnet aus Toren, Gegnerstärke und Heimvorteil der letzten anderthalb Spielzeiten. Kein Bauchgefühl, keine Wettwerbung.</p>
+      <div class="held-karte" id="held-karte"><div class="laedt"><span class="kreisel"></span>Daten werden geladen …</div></div>
+    </div>
+  </section>
+
+  <section id="spieltag" class="abschnitt">
+    <div class="rahmen">
+      <div class="kopf"><p class="nummer">01</p><h2 id="spieltag-titel">Spieltag</h2>
+        <div class="st-wahl"><button type="button" class="rund" id="st-zurueck" aria-label="Vorheriger Spieltag">‹</button><span id="st-name"></span><button type="button" class="rund" id="st-vor" aria-label="Nächster Spieltag">›</button></div>
+      </div>
+      <ul class="legende"><li><i class="f-heim"></i>Heimsieg</li><li><i class="f-remis"></i>Unentschieden</li><li><i class="f-gast"></i>Auswärtssieg</li></ul>
+      <div class="spiele" id="spiele"></div>
+    </div>
+  </section>
+
+  <section id="tabelle" class="abschnitt">
+    <div class="rahmen">
+      <div class="kopf"><p class="nummer">02</p><h2>Saison-Prognose</h2><p class="unter" id="tabelle-text">Die restlichen Spiele 5.000-mal simuliert: So wahrscheinlich ist jeder Tabellenplatz am Saisonende.</p></div>
+      <div class="glas tabelle-wrap"><div id="prognose-tabelle" class="tabelle-scroll"></div></div>
+      <p class="hinweis">Felder: Wahrscheinlichkeit für jeden Endplatz – je heller, desto wahrscheinlicher. Plätze 1–4 Champions League, 16 Relegation, 17–18 Abstieg.</p>
+    </div>
+  </section>
+
+  <section id="staerken" class="abschnitt">
+    <div class="rahmen">
+      <div class="kopf"><p class="nummer">03</p><h2>Teamstärken</h2><p class="unter">Angriff gegen Abwehr: Rechts oben stehen die Teams, die viel treffen und wenig zulassen – jeweils bereinigt um die Stärke der Gegner.</p></div>
+      <div class="glas"><div class="diagramm" id="staerken-diagramm"></div>
+        <details class="tabelle-auf"><summary>Als Tabelle</summary><div id="staerken-tabelle" class="tabelle-scroll"></div></details></div>
+    </div>
+  </section>
+
+  <section id="bilanz" class="abschnitt">
+    <div class="rahmen">
+      <div class="kopf"><p class="nummer">04</p><h2>Wie gut liegt das Orakel?</h2><p class="unter">Ehrlicher Rückblick: Für jeden gespielten Spieltag dieser Saison wurde das Modell nur mit den Daten davor gerechnet – und mit dem echten Ergebnis verglichen.</p></div>
+      <ul class="bilanz-zahlen" id="bilanz-zahlen"></ul>
+      <div class="glas"><div class="diagramm" id="bilanz-diagramm"></div></div>
+    </div>
+  </section>
+
+  <section id="methode" class="abschnitt">
+    <div class="rahmen">
+      <div class="kopf"><p class="nummer">05</p><h2>So rechnet das Orakel</h2></div>
+      <div class="methode">
+        <article><h3>Angriff & Abwehr</h3><p>Für jede Mannschaft wird eine Angriffs- und eine Abwehrstärke geschätzt – aus allen Spielen dieser und der letzten Saison. Ein Tor gegen eine starke Abwehr zählt mehr als gegen eine schwache.</p></article>
+        <article><h3>Aktuelle Form zählt mehr</h3><p>Ältere Spiele verlieren an Gewicht (Halbwertszeit 180 Tage), die Vorsaison zählt nur halb. Aufsteiger starten mit einem Durchschnittswert und werden mit jedem Spiel genauer.</p></article>
+        <article><h3>Poisson-Verteilung</h3><p>Aus den erwarteten Toren beider Teams ergibt sich für jedes mögliche Ergebnis eine Wahrscheinlichkeit (Poisson-Modell mit Dixon-Coles-Korrektur, das Standardverfahren der Fußballstatistik).</p></article>
+        <article><h3>5.000 Saisons</h3><p>Die restlichen Spiele werden 5.000-mal zufällig nach diesen Wahrscheinlichkeiten ausgespielt. Wie oft ein Team dabei Meister wird oder absteigt, ergibt die Prozentwerte.</p></article>
+        <article><h3>Was das Modell nicht weiß</h3><p>Verletzungen, Sperren, Trainerwechsel, Motivation oder Derby-Stimmung. Fußball bleibt Zufall: Auch 70 % heißt, dass es in 3 von 10 Fällen anders ausgeht.</p></article>
+        <article><h3>Keine Wettberatung</h3><p>Ligaorakel ist ein Statistik-Projekt. Es empfiehlt keine Wetten und zeigt keine Quoten. Glücksspiel kann süchtig machen – Hilfe unter <a href="https://www.check-dein-spiel.de" target="_blank" rel="noopener">check-dein-spiel.de</a>.</p></article>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="fuss">
+  <div class="rahmen fuss-raster">
+    <div><p>Spieldaten: <a href="https://www.openligadb.de" target="_blank" rel="noopener">OpenLigaDB</a> (Gemeinschaftsprojekt, frei nutzbar). Vereinslogos: über OpenLigaDB verlinkt; die Marken gehören den jeweiligen Vereinen. Inoffizielles Statistik-Projekt ohne Verbindung zur DFL oder den Vereinen. Alle Angaben ohne Gewähr. <span id="stand"></span></p></div>
+    <p class="fuss-links"><a href="impressum.html">Impressum</a> · <a href="datenschutz.html">Datenschutz</a></p>
+  </div>
+</footer>
+<script type="module" src="assets/app.js"></script>
+</body>
+</html>
