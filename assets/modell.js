@@ -14,7 +14,10 @@ export function spieleAufbereiten(roh) {
     return {
       id: m.matchID, saison: m.leagueSeason, spieltag: m.group?.groupOrderID, zeit: new Date(m.matchDateTimeUTC || m.matchDateTime).getTime(),
       heim: m.team1.teamId, gast: m.team2.teamId, fertig: !!m.matchIsFinished && !!end,
-      th: end ? end.pointsTeam1 : null, tg: end ? end.pointsTeam2 : null, ort: m.location?.locationStadium || ""
+      th: end ? end.pointsTeam1 : null, tg: end ? end.pointsTeam2 : null, ort: m.location?.locationStadium || "",
+      // Live-Stand aus den Toren (OpenLigaDB trägt sie während des Spiels ein)
+      lh: (m.goals || []).reduce((a, g) => Math.max(a, g.scoreTeam1 ?? 0), 0), lg: (m.goals || []).reduce((a, g) => Math.max(a, g.scoreTeam2 ?? 0), 0),
+      tore: (m.goals || []).map(g => ({ minute: g.matchMinute, name: g.goalGetterName, team: g.scoringTeamId, eigentor: !!g.isOwnGoal, elfmeter: !!g.isPenalty }))
     };
   });
 }
@@ -114,4 +117,15 @@ export function rueckblick(alle, teams, saison) {
     proSpieltag.push({ spieltag: st, quote: treffer / tag.length, n: tag.length });
   }
   return { n, tendenz: n ? tendenz / n : 0, exakt: n ? exakt / n : 0, heimImmer: n ? heimImmer / n : 0, brier: n ? brier / n : 0, brierBasis: n ? brierBasis / n : 0, proSpieltag };
+}
+
+/* ---------- Live-Prognose: aktueller Stand + Poisson für die Restspielzeit ---------- */
+export function liveChancen(p, lh, lg, minute) {
+  const rest = Math.max(0, 90 - Math.min(90, minute)) / 90, l = p.l * rest, k = p.k * rest;
+  let ph = 0, pu = 0, pg = 0;
+  for (let x = 0; x <= MAXTORE; x++) for (let y = 0; y <= MAXTORE; y++) {
+    const w = poisson(x, l) * poisson(y, k), a = lh + x, b = lg + y;
+    if (a > b) ph += w; else if (a === b) pu += w; else pg += w;
+  }
+  const s = ph + pu + pg; return { ph: ph / s, pu: pu / s, pg: pg / s };
 }

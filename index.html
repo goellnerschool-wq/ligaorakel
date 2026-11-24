@@ -17,7 +17,8 @@
 <header class="leiste">
   <div class="rahmen leiste-innen">
     <a class="marke" href="./"><img src="assets/symbol.svg" alt="" width="30" height="30"><span>LIGA<b>ORAKEL</b></span></a>
-    <nav class="hauptnav" aria-label="Bereiche"><a href="#spieltag">Spieltag</a><a href="#tabelle">Saison-Prognose</a><a href="#staerken">Teamstärken</a><a href="#bilanz">Trefferquote</a><a href="#methode">Methode</a></nav>
+    <span class="live-anzeige" id="live-anzeige" hidden></span>
+    <nav class="hauptnav" aria-label="Bereiche"><a href="#spieltag">Spieltag</a><a href="#ausfaelle">Ausfälle</a><a href="#tabelle">Saison-Prognose</a><a href="#staerken">Teamstärken</a><a href="#bilanz">Trefferquote</a><a href="#methode">Methode</a></nav>
   </div>
 </header>
 
@@ -42,9 +43,18 @@
     </div>
   </section>
 
+  <section id="ausfaelle" class="abschnitt">
+    <div class="rahmen">
+      <div class="kopf"><p class="nummer">02</p><h2>Ausfälle & Verletzungen</h2><p class="unter">Fällt ein wichtiger Spieler aus, rechnet das Orakel die Teamstärke herunter – geschätzt aus seinem Anteil an den Toren seines Teams. Häkchen setzen, und die Prognosen oben passen sich sofort an.</p></div>
+      <div class="ausfall-kopf"><span>Angezeigt: <b id="ausfall-quelle"></b></span><button type="button" class="rund-text" id="ausfall-zurueck">Auf Stand der Seite zurücksetzen</button></div>
+      <div class="ausfall-raster" id="ausfall-raster"></div>
+      <p class="hinweis">Schätzwert: Ein Torjäger mit 40 % der Teamtore senkt die Angriffsstärke um rund 22 % (ein Ersatzmann trifft ja auch). Jeder weitere fehlende Stammspieler in Abwehr oder Mittelfeld schwächt die Abwehr um 3 %. Deine Änderungen bleiben nur in deinem Browser gespeichert.</p>
+    </div>
+  </section>
+
   <section id="tabelle" class="abschnitt">
     <div class="rahmen">
-      <div class="kopf"><p class="nummer">02</p><h2>Saison-Prognose</h2><p class="unter" id="tabelle-text">Die restlichen Spiele 5.000-mal simuliert: So wahrscheinlich ist jeder Tabellenplatz am Saisonende.</p></div>
+      <div class="kopf"><p class="nummer">03</p><h2>Saison-Prognose</h2><p class="unter" id="tabelle-text">Die restlichen Spiele 5.000-mal simuliert: So wahrscheinlich ist jeder Tabellenplatz am Saisonende.</p></div>
       <div class="glas tabelle-wrap"><div id="prognose-tabelle" class="tabelle-scroll"></div></div>
       <p class="hinweis">Felder: Wahrscheinlichkeit für jeden Endplatz – je heller, desto wahrscheinlicher. Plätze 1–4 Champions League, 16 Relegation, 17–18 Abstieg.</p>
     </div>
@@ -52,7 +62,7 @@
 
   <section id="staerken" class="abschnitt">
     <div class="rahmen">
-      <div class="kopf"><p class="nummer">03</p><h2>Teamstärken</h2><p class="unter">Angriff gegen Abwehr: Rechts oben stehen die Teams, die viel treffen und wenig zulassen – jeweils bereinigt um die Stärke der Gegner.</p></div>
+      <div class="kopf"><p class="nummer">04</p><h2>Teamstärken</h2><p class="unter">Angriff gegen Abwehr: Rechts oben stehen die Teams, die viel treffen und wenig zulassen – jeweils bereinigt um die Stärke der Gegner.</p></div>
       <div class="glas"><div class="diagramm" id="staerken-diagramm"></div>
         <details class="tabelle-auf"><summary>Als Tabelle</summary><div id="staerken-tabelle" class="tabelle-scroll"></div></details></div>
     </div>
@@ -60,7 +70,7 @@
 
   <section id="bilanz" class="abschnitt">
     <div class="rahmen">
-      <div class="kopf"><p class="nummer">04</p><h2>Wie gut liegt das Orakel?</h2><p class="unter">Ehrlicher Rückblick: Für jeden gespielten Spieltag dieser Saison wurde das Modell nur mit den Daten davor gerechnet – und mit dem echten Ergebnis verglichen.</p></div>
+      <div class="kopf"><p class="nummer">05</p><h2>Wie gut liegt das Orakel?</h2><p class="unter">Ehrlicher Rückblick: Für jeden gespielten Spieltag dieser Saison wurde das Modell nur mit den Daten davor gerechnet – und mit dem echten Ergebnis verglichen.</p></div>
       <ul class="bilanz-zahlen" id="bilanz-zahlen"></ul>
       <div class="glas"><div class="diagramm" id="bilanz-diagramm"></div></div>
     </div>
@@ -68,13 +78,14 @@
 
   <section id="methode" class="abschnitt">
     <div class="rahmen">
-      <div class="kopf"><p class="nummer">05</p><h2>So rechnet das Orakel</h2></div>
+      <div class="kopf"><p class="nummer">06</p><h2>So rechnet das Orakel</h2></div>
       <div class="methode">
         <article><h3>Angriff & Abwehr</h3><p>Für jede Mannschaft wird eine Angriffs- und eine Abwehrstärke geschätzt – aus allen Spielen dieser und der letzten Saison. Ein Tor gegen eine starke Abwehr zählt mehr als gegen eine schwache.</p></article>
         <article><h3>Aktuelle Form zählt mehr</h3><p>Ältere Spiele verlieren an Gewicht (Halbwertszeit 180 Tage), die Vorsaison zählt nur halb. Aufsteiger starten mit einem Durchschnittswert und werden mit jedem Spiel genauer.</p></article>
         <article><h3>Poisson-Verteilung</h3><p>Aus den erwarteten Toren beider Teams ergibt sich für jedes mögliche Ergebnis eine Wahrscheinlichkeit (Poisson-Modell mit Dixon-Coles-Korrektur, das Standardverfahren der Fußballstatistik).</p></article>
+        <article><h3>Live während der Spiele</h3><p>Läuft ein Spiel, aktualisiert sich die Seite jede Minute. Die Live-Prognose rechnet mit dem aktuellen Spielstand und den erwarteten Toren für die Restspielzeit. Nach jedem Abpfiff werden Teamstärken, Tabelle und Saison-Simulation neu berechnet.</p></article>
         <article><h3>5.000 Saisons</h3><p>Die restlichen Spiele werden 5.000-mal zufällig nach diesen Wahrscheinlichkeiten ausgespielt. Wie oft ein Team dabei Meister wird oder absteigt, ergibt die Prozentwerte.</p></article>
-        <article><h3>Was das Modell nicht weiß</h3><p>Verletzungen, Sperren, Trainerwechsel, Motivation oder Derby-Stimmung. Fußball bleibt Zufall: Auch 70 % heißt, dass es in 3 von 10 Fällen anders ausgeht.</p></article>
+        <article><h3>Was das Modell nicht weiß</h3><p>Trainerwechsel, Motivation, Wetter oder Derby-Stimmung. Verletzungen fließen nur ein, wenn sie unter „Ausfälle“ eingetragen sind. Fußball bleibt Zufall: Auch 70 % heißt, dass es in 3 von 10 Fällen anders ausgeht.</p></article>
         <article><h3>Keine Wettberatung</h3><p>Ligaorakel ist ein Statistik-Projekt. Es empfiehlt keine Wetten und zeigt keine Quoten. Glücksspiel kann süchtig machen – Hilfe unter <a href="https://www.check-dein-spiel.de" target="_blank" rel="noopener">check-dein-spiel.de</a>.</p></article>
       </div>
     </div>

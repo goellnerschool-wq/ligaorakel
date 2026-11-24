@@ -167,3 +167,36 @@ th.zone-cl, td.zone-cl { box-shadow: inset 0 2px 0 rgba(57, 135, 229, .5); }
 .zeige { opacity: 0; transform: translateY(20px); transition: opacity .7s cubic-bezier(.2, .7, .2, 1), transform .7s cubic-bezier(.2, .7, .2, 1); }
 .zeige.da { opacity: 1; transform: none; }
 @media (prefers-reduced-motion: reduce) { .zeige { opacity: 1; transform: none; transition: none; } }
+
+/* Live */
+.live-anzeige { display: inline-flex; align-items: center; gap: 8px; margin-left: auto; padding: 5px 12px; border-radius: 999px; background: rgba(255, 107, 107, .14); color: #ff8a8a; font-size: .8rem; font-weight: 800; letter-spacing: .06em; }
+.live-anzeige + .hauptnav { margin-left: 12px; }
+.punkt { width: 8px; height: 8px; border-radius: 50%; background: #ff5d5d; box-shadow: 0 0 0 0 rgba(255, 93, 93, .6); animation: pulsieren 1.6s infinite; display: inline-block; }
+@keyframes pulsieren { 70% { box-shadow: 0 0 0 9px rgba(255, 93, 93, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 93, 93, 0); } }
+@media (prefers-reduced-motion: reduce) { .punkt { animation: none; } }
+.live-chip { display: inline-flex; align-items: center; gap: 6px; color: #ff8a8a; font-weight: 800; letter-spacing: .04em; }
+.sp-tipp.live b, .top-mitte .tipp.live { color: #ff8a8a; }
+.live-text { margin: 8px 0 0; color: var(--leise); font-size: .76rem; text-align: center; }
+.ausfall-text { margin: 8px 0 0; color: var(--warn); font-size: .78rem; }
+/* Ausfälle */
+.ausfall-kopf { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; font-size: .9rem; }
+.ausfall-kopf b { color: var(--tinte); }
+.rund-text { padding: 8px 14px; border: 1px solid var(--rand-hell); border-radius: 999px; background: rgba(255, 255, 255, .04); color: var(--tinte); font-size: .85rem; cursor: pointer; }
+.ausfall-raster { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 10px; align-items: start; }
+.ausfall-team { border: 1px solid var(--rand); border-radius: 16px; background: var(--glas); }
+.ausfall-team[open] { border-color: var(--rand-hell); }
+.ausfall-team summary { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; padding: 12px 14px; cursor: pointer; list-style: none; }
+.ausfall-team summary::-webkit-details-marker { display: none; }
+.ausfall-team summary img, .ausfall-team summary .initial { width: 28px; height: 28px; }
+.ausfall-team summary b { color: var(--tinte); }
+.ausfall-team summary small { flex-basis: 100%; color: var(--warn); font-size: .76rem; padding-left: 38px; }
+.ausfall-zahl { margin-left: auto; padding: 2px 8px; border-radius: 999px; background: rgba(255, 181, 71, .14); color: var(--warn); font-size: .78rem; font-weight: 700; }
+.ausfall-liste { list-style: none; margin: 0; padding: 0 14px; }
+.ausfall-liste li { display: flex; justify-content: space-between; gap: 10px; padding: 7px 0; border-top: 1px dashed var(--linie); font-size: .88rem; }
+.ausfall-liste label { display: inline-flex; align-items: center; gap: 8px; color: var(--tinte); cursor: pointer; }
+.ausfall-liste input { width: 18px; height: 18px; accent-color: var(--warn); }
+.ausfall-liste span { color: var(--leise); font-size: .8rem; white-space: nowrap; }
+.ausfall-abwehr { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 14px 14px; font-size: .84rem; }
+.zaehler { display: flex; align-items: center; gap: 6px; }
+.zaehler button { width: 32px; height: 32px; border: 1px solid var(--rand-hell); border-radius: 9px; background: none; color: var(--tinte); font-weight: 800; cursor: pointer; }
+.zaehler b { min-width: 18px; text-align: center; color: var(--tinte); }
