@@ -1,0 +1,7 @@
+{
+  // Cloudflare Worker, der nur die statische Seite aus dem Ordner „public“ ausliefert.
+  // Jede Änderung auf GitHub (Branch main) wird von Cloudflare automatisch veröffentlicht.
+  "name": "ligaorakel",
+  "compatibility_date": "2026-11-01",
+  "assets": { "directory": "./public" }
+}

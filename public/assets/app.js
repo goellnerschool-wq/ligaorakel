@@ -182,9 +182,12 @@ function torschuetzen(team) {
   }
   return { gesamt, liste: [...z.entries()].sort((a, b) => b[1] - a[1]) };
 }
+const nachname = n => String(n || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/^.*[.\s]/, "").trim();
+// „Felix Nmecha“ (aus Nachrichten) findet „F. Nmecha“ (OpenLigaDB-Torschützenliste)
+function treffer(ts, name) { return ts.liste.find(l => l[0] === name) || ts.liste.find(l => nachname(l[0]) === nachname(name) && nachname(name).length > 2); }
 function ausfallFaktor(team) {
   const a = ausfaelle()[team]; if (!a || (!a.spieler?.length && !a.abwehr)) return null;
-  const ts = torschuetzen(team), anteil = (a.spieler || []).reduce((x, n) => x + ((ts.liste.find(l => l[0] === n) || [0, 0])[1]) / Math.max(1, ts.gesamt), 0);
+  const ts = torschuetzen(team), anteil = (a.spieler || []).reduce((x, n) => x + ((treffer(ts, n) || [0, 0])[1]) / Math.max(1, ts.gesamt), 0);
   return { a: Math.max(.7, 1 - anteil * .55), d: 1 + .03 * Math.min(4, a.abwehr || 0) };
 }
 function ausfallModell(m) {
@@ -199,12 +202,12 @@ function ausfallText(team) {
   return [...(a.spieler || []), ...(a.abwehr ? [`${a.abwehr} weitere${a.abwehr === 1 ? "r" : ""} Stammspieler (${T[team]?.kurz})`] : [])];
 }
 function ausfaelleZeigen() {
-  const quelle = lokal ? "deine eigenen Angaben" : Object.keys(zentral).length ? `Stand der Seite${zentralStand ? " vom " + zentralStand : ""}` : "noch keine Ausfälle eingetragen";
+  const quelle = lokal ? "deine eigenen Angaben" : Object.keys(zentral).length ? `Stand der Seite${zentralStand ? " vom " + zentralStand : ""}` : "noch keine Ausfälle für diesen Spieltag eingetragen";
   $("#ausfall-quelle").textContent = quelle;
   $("#ausfall-raster").innerHTML = tabelle.map(t => t.teamInfoId ?? t.teamId).filter(id => T[id]).map(id => {
     const ts = torschuetzen(id), a = ausfaelle()[id] || { spieler: [], abwehr: 0 }, f = ausfallFaktor(id), anzahl = (a.spieler?.length || 0) + (a.abwehr || 0);
     return `<details class="ausfall-team" data-team="${id}"><summary>${logo(id)}<b>${esc(T[id].kurz)}</b>${anzahl ? `<span class="ausfall-zahl">🚑 ${anzahl}</span>` : ""}${f ? `<small>Angriff ${f.a < 1 ? "−" + pz(1 - f.a) + " %" : "±0"} · Abwehr ${f.d > 1 ? "−" + pz(f.d - 1) + " %" : "±0"}</small>` : ""}</summary>
-      <ul class="ausfall-liste">${ts.liste.slice(0, 8).map(([n, tore]) => `<li><label><input type="checkbox" data-spieler="${esc(n)}" ${a.spieler?.includes(n) ? "checked" : ""}> ${esc(n)}</label><span>${tore} ${tore === 1 ? "Tor" : "Tore"} · ${pz(tore / Math.max(1, ts.gesamt))} %</span></li>`).join("") || `<li class="leise">Noch keine Torschützen in dieser Saison.</li>`}</ul>
+      <ul class="ausfall-liste">${ts.liste.slice(0, 8).map(([n, tore]) => `<li><label><input type="checkbox" data-spieler="${esc(n)}" ${(a.spieler || []).some(x => x === n || (nachname(x) === nachname(n) && nachname(n).length > 2)) ? "checked" : ""}> ${esc(n)}</label><span>${tore} ${tore === 1 ? "Tor" : "Tore"} · ${pz(tore / Math.max(1, ts.gesamt))} %</span></li>`).join("") || `<li class="leise">Noch keine Torschützen in dieser Saison.</li>`}</ul>
       <div class="ausfall-abwehr"><span>Weitere Stammspieler fehlen (Abwehr, Tor, Mittelfeld)</span><div class="zaehler"><button type="button" data-abwehr="-1" aria-label="weniger">−</button><b>${a.abwehr || 0}</b><button type="button" data-abwehr="1" aria-label="mehr">+</button></div></div></details>`;
   }).join("");
 }
@@ -222,6 +225,7 @@ async function zentraleAusfaelleLaden() {
   try {
     const r = await fetch("assets/ausfaelle.json?" + Date.now()); if (!r.ok) return;
     const d = await r.json(); zentralStand = d.stand || "";
+    if (d.spieltag && d.spieltag < aktuellerSpieltag && !alle.some(istLive)) { zentral = {}; zentralStand = ""; return; }   // Liste vom vergangenen Spieltag: veraltet
     const nachName = Object.fromEntries(Object.entries(T).flatMap(([id, t]) => [[t.kurz.toLowerCase(), +id], [t.name.toLowerCase(), +id]]));
     zentral = {};
     Object.entries(d.teams || {}).forEach(([name, v]) => { const id = nachName[name.toLowerCase()]; if (id) zentral[id] = { spieler: v.spieler || [], abwehr: v.abwehr || 0 }; });
@@ -244,7 +248,7 @@ async function aktualisieren() {
       const naechster = naechstesSpiel();
       if (naechster && naechster.spieltag !== aktuellerSpieltag && !alle.some(istLive)) aktuellerSpieltag = naechster.spieltag;
       modell = anpassen(alle, teams, Date.now(), SAISON);
-      tabelleZeigen(); staerkenZeigen(); bilanzZeigen(); ausfaelleZeigen();
+      await zentraleAusfaelleLaden(); tabelleZeigen(); staerkenZeigen(); bilanzZeigen(); ausfaelleZeigen();
     }
     const offen = $$(".spiel[open]").map(x => x.dataset.id);
     if (gezeigt === alterSpieltag && aktuellerSpieltag !== alterSpieltag) gezeigt = aktuellerSpieltag;   // Ansicht wandert zum neuen Spieltag mit
@@ -273,19 +277,19 @@ async function start() {
     const [jetzigeSaison, vorsaison, tab] = await Promise.all([holen(`/getmatchdata/bl1/${SAISON}`), holen(`/getmatchdata/bl1/${SAISON - 1}`).catch(() => []), holen(`/getbltable/bl1/${SAISON}`).catch(() => [])]);
     [...vorsaison, ...jetzigeSaison].forEach(m => { roh.set(m.matchID, m); [m.team1, m.team2].forEach(t => { T[t.teamId] = { name: t.teamName, kurz: t.shortName || t.teamName, icon: t.teamIconUrl }; }); });
     alle = spieleAufbereiten([...roh.values()]);
-    await zentraleAusfaelleLaden();
     teams = [...new Set(alle.filter(s => s.saison === SAISON).flatMap(s => [s.heim, s.gast]))];
     tabelle = tab.length ? tab : teams.map(id => ({ teamInfoId: id, shortName: T[id].kurz, matches: 0, points: 0, goals: 0, opponentGoals: 0 }));
     maxSpieltag = Math.max(...alle.filter(s => s.saison === SAISON).map(s => s.spieltag));
     const naechster = naechstesSpiel();
     const st = aktuellerSpieltag = naechster ? naechster.spieltag : maxSpieltag;
+    await zentraleAusfaelleLaden();
     modell = anpassen(alle, teams, Date.now(), SAISON); modellCache.set(st, modell);
     heldZeigen(st); spieltagZeigen(st);
     $("#st-zurueck").onclick = () => spieltagZeigen(Math.max(1, gezeigt - 1));
     $("#st-vor").onclick = () => spieltagZeigen(Math.min(maxSpieltag, gezeigt + 1));
     setTimeout(() => { tabelleZeigen(); staerkenZeigen(); bilanzZeigen(); ausfaelleZeigen(); beobachten(); }, 30);
     liveLeiste(); standSetzen(); planen();
-    $("#ausfall-raster").addEventListener("change", e => { const c = e.target.closest("[data-spieler]"); if (!c) return; const team = +c.closest("[data-team]").dataset.team; ausfallAendern(team, a => { a.spieler = c.checked ? [...new Set([...(a.spieler || []), c.dataset.spieler])] : (a.spieler || []).filter(n => n !== c.dataset.spieler); }); });
+    $("#ausfall-raster").addEventListener("change", e => { const c = e.target.closest("[data-spieler]"); if (!c) return; const team = +c.closest("[data-team]").dataset.team; ausfallAendern(team, a => { a.spieler = c.checked ? [...new Set([...(a.spieler || []), c.dataset.spieler])] : (a.spieler || []).filter(n => n !== c.dataset.spieler && nachname(n) !== nachname(c.dataset.spieler)); }); });
     $("#ausfall-raster").addEventListener("click", e => { const b = e.target.closest("[data-abwehr]"); if (!b) return; const team = +b.closest("[data-team]").dataset.team; ausfallAendern(team, a => { a.abwehr = Math.max(0, Math.min(4, (a.abwehr || 0) + +b.dataset.abwehr)); }); });
     $("#ausfall-zurueck").onclick = () => { lokal = null; speicherSchreiben("ausfaelle", null); nachAusfallAenderung(); };
     let rz; addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => { staerkenZeigen(); bilanzZeigen(); }, 250); });
