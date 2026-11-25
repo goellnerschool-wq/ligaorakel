@@ -1,7 +1,89 @@
 {
   "hinweis": "Ausfälle für den kommenden Spieltag. Wird automatisch gepflegt; ältere Listen (spieltag kleiner als der aktuelle) ignoriert die Seite. Spieler wie in Nachrichten (z. B. Felix Nmecha) – die Seite gleicht über den Nachnamen ab. abwehr = Anzahl weiterer fehlender Stammspieler ohne Tore (0-4).",
-  "spieltag": 0,
-  "stand": "",
-  "quellen": [],
-  "teams": {}
+  "spieltag": 11,
+  "stand": "25.11.2026",
+  "quellen": [
+    "https://www.ligainsider.de/bundesliga/verletzte-und-gesperrte-spieler/ (Teamseiten „Gegen … fehlen“, abgerufen 25.11.2026)"
+  ],
+  "teams": {
+    "FC Bayern München": {
+      "spieler": [
+        "Harry Kane",
+        "Ismael Saibari",
+        "Serge Gnabry"
+      ],
+      "abwehr": 2,
+      "info": "Neuer, Davies"
+    },
+    "Borussia Dortmund": {
+      "spieler": [
+        "Giannis Konstantelias"
+      ],
+      "abwehr": 1,
+      "info": "Inácio; Can, Lerma, Kaba länger raus"
+    },
+    "Bayer 04 Leverkusen": {
+      "spieler": [],
+      "abwehr": 1,
+      "info": "Terrier; Eichhorn im Aufbau"
+    },
+    "TSG Hoffenheim": {
+      "spieler": [
+        "Ozan Kabak"
+      ],
+      "abwehr": 2,
+      "info": "Kabak gesperrt (Rot); Gendrey, Hajdari, Hranáč, De Cat"
+    },
+    "FC Augsburg": {
+      "spieler": [],
+      "abwehr": 1,
+      "info": "Matsima; Mounié im Aufbau"
+    },
+    "1. FC Union Berlin": {
+      "spieler": [],
+      "abwehr": 2,
+      "info": "Van Den Bosch (5. Gelbe) und Uduokhai (Rot) gesperrt; Markgraf, Skov, Nsoki"
+    },
+    "Borussia Mönchengladbach": {
+      "spieler": [
+        "Hugo Bolin"
+      ],
+      "abwehr": 1,
+      "info": "Ullrich; Leopold, Hashioka, Leszczyński"
+    },
+    "Hamburger SV": {
+      "spieler": [
+        "Miro Muheim"
+      ],
+      "abwehr": 1,
+      "info": "Sambi Lokonga; Remberg, Nadir"
+    },
+    "1. FC Köln": {
+      "spieler": [
+        "Thijs Dallinga"
+      ],
+      "abwehr": 1,
+      "info": "Castro-Montes; Skhiri, Hübers, Rondić, van den Berg"
+    },
+    "FC Schalke 04": {
+      "spieler": [
+        "Maximilian Wöber"
+      ],
+      "abwehr": 1,
+      "info": "Lasme; Heekeren, Højlund, Siebeking"
+    },
+    "SV 07 Elversberg": {
+      "spieler": [],
+      "abwehr": 1,
+      "info": "Mickelson; Seifert"
+    },
+    "SV Werder Bremen": {
+      "spieler": [
+        "Mitchell Weiser",
+        "Ludovit Reis"
+      ],
+      "abwehr": 0,
+      "info": "Weiser, Reis im Aufbautraining; Quetant"
+    }
+  }
 }
